@@ -77,11 +77,14 @@ def quaternion_fully_connected(tensor,weights,bias):
 def quaternion_norm(quaternion_tensor):
     squares=quaternion_tensor*quaternion_tensor
     
-    return tf.reduce_sum(squares,axis=-1)**0.5
+    return tf.sqrt(tf.reduce_sum(squares,axis=-1))
 
-def quaternion_mod_relu(quaternion_tensor,radius):
+def quaternion_mod_relu(quaternion_tensor,radius=0.25):
+    norm=quaternion_norm(quaternion_tensor)
+    A=tf.expand_dims(norm,axis=2)
+    B=tf.tile(A,[1,1,tf.shape(quaternion_tensor)[-1]])
     
-    return tf.where(quaternion_norm(quaternion_tensor)>radius,quaternion_tensor,tf.zeros(tf.shape(quaternion_tensor)))
+    return tf.where(B>radius,quaternion_tensor,tf.zeros(tf.shape(quaternion_tensor)))
     
     
     
